@@ -7,16 +7,29 @@
     let todoState = [];
     let oldTodoState = [];
 
-    function addTodoToDom() {
-      
+    function addTodoToDom(todo) {
+      const todoList = document.getElementById("todos");
+      const todo = document.createElement("div");
+      todoItem.setAttribute("id",`todo-${todo.id}`);
+      todo.innerHTML = `<h3>${todo.title}</h3><p>${todo.description}</p>`;
+      todoList.appendChild(todoItem) 
     }
 
     function removeTodoFromDom(todo) {
+      const todoItem = document.getElementById(`todo-${todoId}`);
+      if(todoItem){
+      todoItem.parentNode.removeChild(todoItem);
+      }else{
+        console.log("Todo not found");
+      }
       
     }
 
     function updateTodoInDom(oldTodo, newTodo) {
-        
+        const todoItem = document.getElementById(`todo-${oldTodo.id}`);
+        if(todoItem){
+          todoItem.innerHTML = `<h3>${newTodo.title}</h3><p>${newTodo.description}</p>`;
+        }
     }
 
     function updateState(newTodos) {
@@ -25,13 +38,18 @@
       // 1. added
       // 2. deleted
       // 3. updated
-      const added = [];
-      const deleted = [];
-      const updated = [];
-      // calculate these 3 arrays
-      // call addTodo, removeTodo, updateTodo functions on each of the
-      // elements
-      oldTodoState = newTodos;
+      const added = newTodos.filter(newTodo => !oldTodoState.some(oldTodo => oldTodo.id === newTodo.id));
+      const deleted = oldTodoState.filter(oldTodo => !newTodos.some(newTodo => newTodo.id === oldTodo.id));
+      const updated = newTodos.filter(newTodo => oldTodoState.some(oldTodo => oldTodo.id === newTodo.id && (oldTodo.title !== newTodo.title || oldTodo.description !== newTodo.description)));
+
+      added.forEach(todo => addTodoToDom(todo));
+      deleted.forEach(todo => removeTodoFromDom(todo.id));
+      updated.forEach(newTodo => {
+        const oldTodo = oldTodoState.find(oldTodo => oldTodo.id === newTodo.id);
+        updateTodoInDom(oldTodo, newTodo);
+      });
+
+      oldTodoState = [...newTodos];
     }
 
     function addTodo() {
